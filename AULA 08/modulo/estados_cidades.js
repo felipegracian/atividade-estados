@@ -22499,7 +22499,7 @@ var estadosCidades = {
 
 
 const getListaDeEstados = function () {
-   let jSonUf = { quantidade: 0 };
+   let jSonUf = {uf: [], quantidade: 0 };
    let arrayListaDeEstados = [];
    jSonUf.uf = arrayListaDeEstados
    estadosCidades.estados.forEach(function (ufDosestados) {
@@ -22513,6 +22513,7 @@ const getListaDeEstados = function () {
 const getDadosEstado = (siglaestado) => {
    let dadosEstado = { uf: '', descricao: '', capital: '', regiao: '' }
    let status = false;
+
 
    estadosCidades.estados.forEach(function (informacoesDoEstado) {
       if (informacoesDoEstado.sigla == siglaestado.toUpperCase()) {
@@ -22645,6 +22646,12 @@ const getCidades = (siglaEstado) => {
 
 }
 
-console.log(getDadosEstado('sp'))
-console.log(getCapitalEstado('am'))
-console.log(getEstadosRegiao('sUDESTE'))
+
+module.exports = {
+   getDadosEstado,
+   getEstadosRegiao,
+   getCidades,
+   getCapitalPais,
+   getCapitalEstado,
+   getListaDeEstados
+}
