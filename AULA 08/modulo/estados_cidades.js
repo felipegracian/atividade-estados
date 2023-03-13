@@ -22510,13 +22510,13 @@ const getListaDeEstados = function () {
    return jSonUf
 }
 
-const getDadosEstado = (siglaestado) => {
+const getDadosEstado = (siglaEstado) => {
    let dadosEstado = { uf: '', descricao: '', capital: '', regiao: '' }
    let status = false;
 
 
    estadosCidades.estados.forEach(function (informacoesDoEstado) {
-      if (informacoesDoEstado.sigla == siglaestado.toUpperCase()) {
+      if (informacoesDoEstado.sigla == siglaEstado.toUpperCase()) {
          dadosEstado.uf = informacoesDoEstado.sigla;
          dadosEstado.descricao = informacoesDoEstado.nome;
          dadosEstado.capital = informacoesDoEstado.capital;
@@ -22555,16 +22555,16 @@ const getCapitalEstado = (siglaEstado) => {
 }
 
 const getEstadosRegiao = (regiaoDesejada) => {
-   let primeiraLetra = regiaoDesejada.charAt(0).toUpperCase()
-   let restoDaFrase = regiaoDesejada.slice(1).toLowerCase()
-   let regiaoComTratamento = primeiraLetra + restoDaFrase
+
+
+   let regiao = regiaoDesejada.toUpperCase()
    let estadosDeCadaRegiao = {}
    let arrayListaDeEstados = []
    let status = false
 
 
    estadosCidades.estados.forEach(function (estadosRegiao) {
-      if (estadosRegiao.regiao == regiaoComTratamento) {
+      if (estadosRegiao.regiao.toUpperCase() == regiao) {
          let listaSiglaEDescricao = {}
          listaSiglaEDescricao.uf = estadosRegiao.sigla
          listaSiglaEDescricao.descricao = estadosRegiao.nome
@@ -22574,7 +22574,7 @@ const getEstadosRegiao = (regiaoDesejada) => {
    })
 
    if (status == true) {
-      estadosDeCadaRegiao.regiao = regiaoComTratamento
+      estadosDeCadaRegiao.regiao = regiao
       estadosDeCadaRegiao.estados = arrayListaDeEstados
       return estadosDeCadaRegiao
    } else {
@@ -22645,6 +22645,7 @@ const getCidades = (siglaEstado) => {
    }
 
 }
+
 
 
 module.exports = {

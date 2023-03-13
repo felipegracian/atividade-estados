@@ -30,6 +30,8 @@ const cors = require('cors');
 //Dependencia para gerenciar o corpo das requsiçoes da API
 const bodyParser = require('body-parser');
 
+const estadosCidades = require('./modulo/estados_cidades.js')
+
 //cria um objeto com as caracteristicas do express
 const app = express();
 
@@ -55,12 +57,136 @@ app.use((request, response, next) => {
 
 //Endpoint para lstar todos os estados
 app.get('/estados', cors(), async function(request, response, next){
-    const estadosCidades = require('./modulo/estados_cidades.js')
+    
     let estados = estadosCidades.getListaDeEstados()
-    response.status(200)
-    response.json(estados)
+
+
+    //Tratamento para validar o sucesso da requisiçao
+    if(estados){
+        response.status(200)
+        response.json(estados)
+    } else{
+        response.status(500)
+    }
 })
 
+//Endpoint : listarDadosEstado(siglaestado)
+app.get('/estado/:uf', cors(), async function(request, response, next){
+
+    let statusCode;
+    let dadosEstado = {};
+
+    //Recebe a sigla do Estado que sera enviada pela URL da requisiçao
+    let siglaEstado = request.params.uf
+
+    //tratamentos para validaçao de entrada de dados corretos
+    if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
+        statusCode = 400
+        dadosEstado.message = 'Não foi possivel processar pois os dados de entrada (uf) não correspondem aos parametros'
+    } else{
+        let estado = estadosCidades.getDadosEstado(siglaEstado)
+
+        if(estado){
+            statusCode = 200
+            dadosEstado = estado
+        } else{
+            statusCode = 400
+        }
+    }
+
+    response.status(statusCode)
+    response.json(dadosEstado)
+})
+
+app.get('/capital/:uf', cors(), async function(request, response, next){
+    let statusCode;
+    let dadosCapital = {};
+
+    let siglaEstado = request.params.uf
+
+    if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
+        statusCode = 400
+        dadosEstado.message = 'Não foi possivel processar pois os dados de entrada (uf) não correspondem aos parametros'
+    } else{
+        let capitalEstado = estadosCidades.getCapitalEstado(siglaEstado)
+
+        if(capitalEstado){
+            statusCode = 200
+            dadosCapital = capitalEstado
+        } else{
+            statusCode = 400
+        }
+    }
+
+    response.status(statusCode)
+    response.json(dadosCapital)
+})
+
+app.get('/estadosRegiao/:regiao', cors(), async function(request, response, next){
+    let statusCode;
+    let estadosRegiao = {};
+
+    let regiaoDesejada = request.params.regiao
+
+    if(regiaoDesejada == '' || regiaoDesejada == undefined || !isNaN(regiaoDesejada)){
+        statusCode = 400
+        estadosRegiao.message = 'Não foi possivel processar pois os dados de entrada (regiao) não correspondem aos parametros'
+    } else{
+        let listaDeEstados = estadosCidades.getEstadosRegiao(regiaoDesejada)
+
+        if(listaDeEstados){
+            statusCode = 200
+            estadosRegiao = listaDeEstados
+        } else{
+            statusCode = 404
+        }
+    }
+
+    response.status(statusCode)
+    response.json(estadosRegiao)
+})
+
+app.get('/capitaisPais', cors(), async function(request, response, next){
+    let statusCode;
+    let listaCapitais = {}
+    let capitais = estadosCidades.getCapitalPais()
+
+    if(capitais){
+        statusCode = 200
+        listaCapitais = capitais
+    } else{
+        statusCode = 400
+    }
+
+    response.status(statusCode)
+    response.json(listaCapitais)
+})
+
+app.get('/cidades/:estado', cors(), async function(request, response, next){
+    let statusCode;
+    let listaCidades = {}
+
+    let estadoDesejado = request.params.estado
+
+    if(estadoDesejado == '' || estadoDesejado == undefined || !isNaN(estadoDesejado) || estadoDesejado.length != 2){
+        statusCode = 400
+        listaCidades.message = 'Não foi possivel processar pois os dados de entrada (regiao) não correspondem aos parametros'
+    } else{
+        let cidades = estadosCidades.getCidades(estadoDesejado)
+
+        if(cidades){
+            statusCode = 200
+            listaCidades = cidades
+        } else{
+            statusCode = 400
+        }
+    }
+
+    response.status(statusCode)
+    response.json(listaCidades)
+})
+
+//Roda o serviço da API para ficar aguardadndo requisições
 app.listen(8080, function(){
     console.log('Servidor aguardando requisições na porta 8080.')
 })
