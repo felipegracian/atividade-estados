@@ -56,7 +56,7 @@ app.use((request, response, next) => {
 //Obs: se não usar o async a requisição é perdida pois o front acha que a API esta fora do ar
 
 //Endpoint para lstar todos os estados
-app.get('/estados', cors(), async function(request, response, next){
+app.get('/senai/estados', cors(), async function(request, response, next){
     
     let estados = estadosCidades.getListaDeEstados()
 
@@ -71,7 +71,7 @@ app.get('/estados', cors(), async function(request, response, next){
 })
 
 //Endpoint : listarDadosEstado(siglaestado)
-app.get('/estado/:uf', cors(), async function(request, response, next){
+app.get('/senai/estado/sigla/:uf', cors(), async function(request, response, next){
 
     let statusCode;
     let dadosEstado = {};
@@ -98,7 +98,7 @@ app.get('/estado/:uf', cors(), async function(request, response, next){
     response.json(dadosEstado)
 })
 
-app.get('/capital/:uf', cors(), async function(request, response, next){
+app.get('/senai/capital/sigla/:uf', cors(), async function(request, response, next){
     let statusCode;
     let dadosCapital = {};
 
@@ -122,7 +122,7 @@ app.get('/capital/:uf', cors(), async function(request, response, next){
     response.json(dadosCapital)
 })
 
-app.get('/estadosRegiao/:regiao', cors(), async function(request, response, next){
+app.get('/senai/estadosRegiao/regiao/:regiao', cors(), async function(request, response, next){
     let statusCode;
     let estadosRegiao = {};
 
@@ -146,7 +146,7 @@ app.get('/estadosRegiao/:regiao', cors(), async function(request, response, next
     response.json(estadosRegiao)
 })
 
-app.get('/capitaisPais', cors(), async function(request, response, next){
+app.get('/senai/capitaisPais', cors(), async function(request, response, next){
     let statusCode;
     let listaCapitais = {}
     let capitais = estadosCidades.getCapitalPais()
@@ -162,29 +162,67 @@ app.get('/capitaisPais', cors(), async function(request, response, next){
     response.json(listaCapitais)
 })
 
-app.get('/cidades/:estado', cors(), async function(request, response, next){
+// app.get('/senai/cidades/estado/:estado', cors(), async function(request, response, next){
+//     let statusCode;
+//     let listaCidades = {}
+
+//     let estadoDesejado = request.params.estado
+
+//     if(estadoDesejado == '' || estadoDesejado == undefined || !isNaN(estadoDesejado) || estadoDesejado.length != 2){
+//         statusCode = 400
+//         listaCidades.message = 'Não foi possivel processar pois os dados de entrada (regiao) não correspondem aos parametros'
+//     } else{
+//         let cidades = estadosCidades.getCidades(estadoDesejado)
+
+//         if(cidades){
+//             statusCode = 200
+//             listaCidades = cidades
+//         } else{
+//             statusCode = 400
+//         }
+//     }
+
+//     response.status(statusCode)
+//     response.json(listaCidades)
+// })
+
+
+app.get('/v2/senai/cidades', cors(), async function(request, response, next){
+
+    /**
+     * Existem duas opções para receber variaveis para filtro:
+     * 1 opção: params- permite receber a variável na estrutura da url criada no endpoint (geralmente utilizado para id (PK))
+     * 
+     * 2 opção: query- Também conhecido como queryString permite receber uma ou muitas variáveis para realizar filtros avançado
+     */
+
+    //recebe uma variavl encaminhada via query string
+    let siglaEstado = request.query.uf
+
     let statusCode;
-    let listaCidades = {}
+    let dadosCidades = {};
 
-    let estadoDesejado = request.params.estado
-
-    if(estadoDesejado == '' || estadoDesejado == undefined || !isNaN(estadoDesejado) || estadoDesejado.length != 2){
+    //tratamentos para validaçao de entrada de dados corretos
+    if(siglaEstado == '' || siglaEstado == undefined || siglaEstado.length != 2 || !isNaN(siglaEstado)){
         statusCode = 400
-        listaCidades.message = 'Não foi possivel processar pois os dados de entrada (regiao) não correspondem aos parametros'
+        dadosCidades.message = 'Não foi possivel processar pois os dados de entrada (uf) não correspondem aos parametros'
     } else{
-        let cidades = estadosCidades.getCidades(estadoDesejado)
+        let cidades = estadosCidades.getCidades(siglaEstado)
 
         if(cidades){
             statusCode = 200
-            listaCidades = cidades
+            dadosCidades = cidades
         } else{
             statusCode = 400
         }
     }
 
     response.status(statusCode)
-    response.json(listaCidades)
+    response.json(dadosCidades)
+
+    console.log(siglaEstado)
 })
+
 
 //Roda o serviço da API para ficar aguardadndo requisições
 app.listen(8080, function(){
